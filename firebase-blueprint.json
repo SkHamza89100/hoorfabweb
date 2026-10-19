@@ -1,0 +1,113 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "Catalog item in the HOOR FAB store",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique product ID" },
+        "title": { "type": "string", "description": "Product display title" },
+        "subtitle": { "type": "string", "description": "Product subtitle description" },
+        "category": { "type": "string", "description": "Ethnic wear category" },
+        "price": { "type": "number", "description": "Current selling price in INR" },
+        "compareAtPrice": { "type": "number", "description": "Original MRP price in INR" },
+        "images": { "type": "array", "description": "List of product image URLs" },
+        "fabric": { "type": "string", "description": "Fabric type" },
+        "sizes": { "type": "array", "description": "Available clothing sizes" },
+        "inStock": { "type": "boolean", "description": "Whether item is currently in stock" },
+        "stockCount": { "type": "number", "description": "Available stock quantity" },
+        "sku": { "type": "string", "description": "Unique SKU code" },
+        "description": { "type": "string", "description": "Detailed product description" },
+        "rating": { "type": "number", "description": "Average review score" },
+        "reviewsCount": { "type": "number", "description": "Total customer review count" },
+        "isFeatured": { "type": "boolean", "description": "Whether item appears in popular styles" },
+        "isNew": { "type": "boolean", "description": "Whether item is tagged as new drop" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp of last update" }
+      },
+      "required": ["id", "title", "category", "price", "images", "sku"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer purchase order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique Firestore order ID" },
+        "orderNumber": { "type": "string", "description": "Human-readable order code (e.g. HF-8941)" },
+        "customer": { "type": "object", "description": "Customer contact and delivery details" },
+        "items": { "type": "array", "description": "Ordered products, sizes and quantities" },
+        "subtotal": { "type": "number", "description": "Order subtotal in INR" },
+        "discount": { "type": "number", "description": "Discount applied in INR" },
+        "couponCode": { "type": "string", "description": "Applied promo code" },
+        "shipping": { "type": "number", "description": "Courier shipping cost in INR" },
+        "total": { "type": "number", "description": "Total charged amount in INR" },
+        "status": { "type": "string", "description": "Order fulfillment status" },
+        "paymentMethod": { "type": "string", "description": "Payment type chosen" },
+        "createdAt": { "type": "string", "description": "ISO order timestamp" },
+        "trackingNumber": { "type": "string", "description": "Courier tracking number" },
+        "estimatedDelivery": { "type": "string", "description": "Estimated delivery timeline" }
+      },
+      "required": ["id", "orderNumber", "customer", "items", "total", "status", "createdAt"]
+    },
+    "SiteMedia": {
+      "title": "SiteMedia",
+      "description": "Storefront banners, hero photo, and category grid media",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Config document identifier" },
+        "heroImage": { "type": "string", "description": "Homepage top hero banner model photo" },
+        "heroBadgeTitle": { "type": "string", "description": "Hero badge headline" },
+        "heroBadgeSubtitle": { "type": "string", "description": "Hero badge subheadline" },
+        "categories": { "type": "array", "description": "List of 6 category showcase items" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp of update" }
+      },
+      "required": ["id", "heroImage", "categories"]
+    },
+    "ActivityLog": {
+      "title": "ActivityLog",
+      "description": "Audit and operational activity stream record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Log entry ID" },
+        "type": { "type": "string", "description": "Activity category" },
+        "description": { "type": "string", "description": "Human readable event log" },
+        "timestamp": { "type": "string", "description": "Formatted time display" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "type", "description", "timestamp"]
+    },
+    "AdminSettings": {
+      "title": "AdminSettings",
+      "description": "Store admin credentials and configuration",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Setting ID" },
+        "adminId": { "type": "string", "description": "Active admin login username/email" },
+        "adminPass": { "type": "string", "description": "Active admin password" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "adminId", "adminPass"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Real-time store products collection"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Customer purchase orders and fulfillment tracking"
+    },
+    "/siteMedia/{configId}": {
+      "schema": "SiteMedia",
+      "description": "Storefront hero and category media settings"
+    },
+    "/activityLogs/{logId}": {
+      "schema": "ActivityLog",
+      "description": "Real-time store operation activity events"
+    },
+    "/adminSettings/{settingId}": {
+      "schema": "AdminSettings",
+      "description": "Encrypted administrative portal credentials"
+    }
+  }
+}

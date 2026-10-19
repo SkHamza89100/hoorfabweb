@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isValidId(docId) {
+      return docId is string && docId.size() > 0 && docId.size() <= 128;
+    }
+
+    // Products collection: Public read for shoppers, write for store management
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isValidId(productId);
+    }
+
+    // Orders collection: Shoppers can create orders and track them; store manages them
+    match /orders/{orderId} {
+      allow read: if true;
+      allow create: if isValidId(orderId);
+      allow update, delete: if isValidId(orderId);
+    }
+
+    // Site Media collection: Public read for banners & category photos; store updates them
+    match /siteMedia/{configId} {
+      allow read: if true;
+      allow write: if isValidId(configId);
+    }
+
+    // Activity Logs: Operations log for store actions
+    match /activityLogs/{logId} {
+      allow read: if true;
+      allow write: if isValidId(logId);
+    }
+
+    // Admin Settings: Store admin credentials & preferences
+    match /adminSettings/{settingId} {
+      allow read: if true;
+      allow write: if isValidId(settingId);
+    }
+
+    // Default catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

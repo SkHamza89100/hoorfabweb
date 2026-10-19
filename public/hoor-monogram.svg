@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150" fill="none">
+  <!-- Outer Capsule Stadium Arch matching 4-removebg-preview.png -->
+  <path 
+    d="M 16 50 A 34 34 0 0 1 84 50 L 84 100 A 34 34 0 0 1 16 100 Z" 
+    stroke="#d5c0a1" 
+    stroke-width="3.2" 
+    stroke-linejoin="round"
+  />
+
+  <!-- High-contrast Classical Serif Monogram 'H' -->
+  <!-- Left Pillar with bracketed serifs -->
+  <path 
+    d="M 27 54 L 49 54 L 49 56.5 C 45 57 41 59.5 41 64 L 41 86 C 41 90.5 45 93 49 93.5 L 49 96 L 27 96 L 27 93.5 C 31 93 35 90.5 35 86 L 35 64 C 35 59.5 31 57 27 56.5 Z" 
+    fill="#d5c0a1" 
+  />
+
+  <!-- Right Pillar with bracketed serifs -->
+  <path 
+    d="M 51 54 L 73 54 L 73 56.5 C 69 57 65 59.5 65 64 L 65 86 C 65 90.5 69 93 73 93.5 L 73 96 L 51 96 L 51 93.5 C 55 93 59 90.5 59 86 L 59 64 C 59 59.5 55 57 51 56.5 Z" 
+    fill="#d5c0a1" 
+  />
+
+  <!-- Crossbar -->
+  <rect x="41" y="73" width="18" height="4" fill="#d5c0a1" />
+
+  <!-- Botanical Leaf Flourish 1: Upper-Right Corner -->
+  <g stroke="#d5c0a1" fill="none">
+    <!-- Main curving branch stem -->
+    <path d="M 54 52 Q 64 36 76 22" stroke-width="1.6" stroke-linecap="round" />
+    
+    <!-- Leaf 1 (lower right) -->
+    <path d="M 61 43 Q 69 40 75 45 Q 68 48 61 43 Z" stroke-width="1.2" />
+    <path d="M 61 43 Q 68 43 74 45" stroke-width="0.9" />
+    
+    <!-- Leaf 2 (mid left) -->
+    <path d="M 65 34 Q 59 30 55 33 Q 60 37 65 34 Z" stroke-width="1.2" />
+    <path d="M 65 34 Q 59 32 55 33" stroke-width="0.9" />
+
+    <!-- Leaf 3 (mid right) -->
+    <path d="M 69 30 Q 75 26 80 31 Q 74 34 69 30 Z" stroke-width="1.2" />
+    <path d="M 69 30 Q 75 30 79 31" stroke-width="0.9" />
+
+    <!-- Leaf 4 (tip leaf) -->
+    <path d="M 73 25 Q 75 18 78 21 Q 78 26 73 25 Z" stroke-width="1.2" />
+    <path d="M 73 25 Q 76 21 77 21" stroke-width="0.9" />
+
+    <!-- Leaf 5 (side leaf) -->
+    <path d="M 57 48 Q 50 46 48 50 Q 53 52 57 48 Z" stroke-width="1.2" />
+    <path d="M 57 48 Q 51 48 48 50" stroke-width="0.9" />
+  </g>
+
+  <!-- Botanical Leaf Flourish 2: Lower-Left Corner -->
+  <g stroke="#d5c0a1" fill="none">
+    <!-- Main curving branch stem -->
+    <path d="M 46 98 Q 36 114 24 128" stroke-width="1.6" stroke-linecap="round" />
+
+    <!-- Leaf 1 (upper left) -->
+    <path d="M 39 107 Q 31 109 25 105 Q 32 102 39 107 Z" stroke-width="1.2" />
+    <path d="M 39 107 Q 31 106 26 105" stroke-width="0.9" />
+
+    <!-- Leaf 2 (mid right) -->
+    <path d="M 35 116 Q 41 120 45 117 Q 40 113 35 116 Z" stroke-width="1.2" />
+    <path d="M 35 116 Q 41 118 44 117" stroke-width="0.9" />
+
+    <!-- Leaf 3 (lower left) -->
+    <path d="M 31 120 Q 25 124 20 120 Q 26 116 31 120 Z" stroke-width="1.2" />
+    <path d="M 31 120 Q 25 121 21 120" stroke-width="0.9" />
+
+    <!-- Leaf 4 (tip bottom leaf) -->
+    <path d="M 27 125 Q 25 132 22 129 Q 22 124 27 125 Z" stroke-width="1.2" />
+    <path d="M 27 125 Q 24 129 23 129" stroke-width="0.9" />
+
+    <!-- Leaf 5 (upper side leaf) -->
+    <path d="M 43 102 Q 50 104 52 100 Q 47 98 43 102 Z" stroke-width="1.2" />
+    <path d="M 43 102 Q 49 102 52 100" stroke-width="0.9" />
+  </g>
+</svg>

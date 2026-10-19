@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" fill="none">
+  <!-- Outer Capsule Stadium Arch matching user uploaded logo -->
+  <path 
+    d="M 72 75 A 48 48 0 0 1 168 75 L 168 135 A 48 48 0 0 1 72 135 Z" 
+    stroke="currentColor" 
+    stroke-width="2.8" 
+    stroke-linejoin="round"
+  />
+
+  <!-- High-contrast Classical Serif Monogram 'H' -->
+  <!-- Left Pillar with bracketed serifs -->
+  <path 
+    d="M 88 82 L 118 82 L 118 85.5 C 112 86.5 106 89.5 106 96 L 106 124 C 106 130.5 112 133.5 118 134.5 L 118 138 L 88 138 L 88 134.5 C 94 133.5 100 130.5 100 124 L 100 96 C 100 89.5 94 86.5 88 85.5 Z" 
+    fill="currentColor" 
+  />
+
+  <!-- Right Pillar with bracketed serifs -->
+  <path 
+    d="M 122 82 L 152 82 L 152 85.5 C 146 86.5 140 89.5 140 96 L 140 124 C 140 130.5 146 133.5 152 134.5 L 152 138 L 122 138 L 122 134.5 C 128 133.5 134 130.5 134 124 L 134 96 C 134 89.5 128 86.5 122 85.5 Z" 
+    fill="currentColor" 
+  />
+
+  <!-- Horizontal Crossbar -->
+  <rect x="104" y="107" width="28" height="5" fill="currentColor" />
+
+  <!-- Botanical Leaf Flourish 1: Upper-Right Corner -->
+  <g stroke="currentColor" fill="none">
+    <!-- Main stem curving inward -->
+    <path d="M 126 78 Q 140 56 156 36" stroke-width="1.8" stroke-linecap="round" />
+    
+    <!-- Leaf 1 (lower right) -->
+    <path d="M 135 66 Q 146 62 154 69 Q 144 73 135 66 Z" stroke-width="1.4" />
+    <!-- Leaf 2 (mid left) -->
+    <path d="M 141 53 Q 133 47 127 52 Q 134 57 141 53 Z" stroke-width="1.4" />
+    <!-- Leaf 3 (mid right) -->
+    <path d="M 147 47 Q 155 41 162 48 Q 154 52 147 47 Z" stroke-width="1.4" />
+    <!-- Leaf 4 (tip top leaf) -->
+    <path d="M 152 40 Q 155 30 159 34 Q 159 41 152 40 Z" stroke-width="1.4" />
+    <!-- Leaf 5 (side leaf) -->
+    <path d="M 130 72 Q 120 69 117 75 Q 124 78 130 72 Z" stroke-width="1.4" />
+  </g>
+
+  <!-- Botanical Leaf Flourish 2: Lower-Left Corner -->
+  <g stroke="currentColor" fill="none">
+    <!-- Main stem curving inward -->
+    <path d="M 114 145 Q 100 167 84 187" stroke-width="1.8" stroke-linecap="round" />
+    
+    <!-- Leaf 1 (upper left) -->
+    <path d="M 105 157 Q 94 161 86 154 Q 96 150 105 157 Z" stroke-width="1.4" />
+    <!-- Leaf 2 (mid right) -->
+    <path d="M 99 170 Q 107 176 113 171 Q 106 166 99 170 Z" stroke-width="1.4" />
+    <!-- Leaf 3 (lower left) -->
+    <path d="M 93 176 Q 85 182 78 175 Q 86 171 93 176 Z" stroke-width="1.4" />
+    <!-- Leaf 4 (tip bottom leaf) -->
+    <path d="M 88 183 Q 85 193 81 189 Q 81 182 88 183 Z" stroke-width="1.4" />
+    <!-- Leaf 5 (upper side leaf) -->
+    <path d="M 110 151 Q 120 154 123 148 Q 116 145 110 151 Z" stroke-width="1.4" />
+  </g>
+
+  <!-- Brand Wordmark HOOR FAB in classical luxury serif -->
+  <text 
+    x="120" 
+    y="228" 
+    text-anchor="middle" 
+    font-family="'Cormorant Garamond', 'Cinzel', serif" 
+    font-size="34" 
+    font-weight="600" 
+    letter-spacing="0.16em" 
+    fill="currentColor"
+  >
+    HOOR FAB
+  </text>
+</svg>
