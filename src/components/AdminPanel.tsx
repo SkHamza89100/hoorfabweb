@@ -3,6 +3,7 @@ import { useStore } from '../context/StoreContext';
 import { Product, Order, OrderStatus, ProductCategory, FabricType, ProductSize, CategoryMediaItem } from '../types';
 import { HoorFabLogo } from './HoorFabLogo';
 import { WhatsAppIcon } from './WhatsAppIcon';
+import { compressImageFile } from '../utils/imageCompressor';
 import { 
   BarChart3, 
   Package, 
@@ -81,7 +82,9 @@ export const AdminPanel: React.FC = () => {
     adminLogout,
     siteMedia,
     updateHeroImage,
+    updateHeroSlideImage,
     updateHeroDetails,
+    updateGalleryPresetPhoto,
     updateCategoryMedia,
     resetSiteMedia
   } = useStore();
@@ -261,20 +264,49 @@ export const AdminPanel: React.FC = () => {
   };
 
   // Real-time Store Media (Hero & Category Photos) Handlers
-  const handleHeroFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHeroFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 8 * 1024 * 1024) {
-        alert('File size exceeds 8MB. Please choose an image under 8MB.');
+      if (file.size > 12 * 1024 * 1024) {
+        alert('File size exceeds 12MB. Please choose an image under 12MB.');
         return;
       }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string;
-        updateHeroImage(dataUrl);
-      };
-      reader.readAsDataURL(file);
+      const compressedDataUrl = await compressImageFile(file);
+      if (compressedDataUrl) {
+        updateHeroImage(compressedDataUrl);
+      }
     }
+    e.target.value = '';
+  };
+
+  const handleHeroSlideUpload = async (e: React.ChangeEvent<HTMLInputElement>, slideIndex: number) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 12 * 1024 * 1024) {
+        alert('File size exceeds 12MB. Please choose an image under 12MB.');
+        return;
+      }
+      const compressedDataUrl = await compressImageFile(file);
+      if (compressedDataUrl) {
+        updateHeroSlideImage(slideIndex, compressedDataUrl);
+      }
+    }
+    e.target.value = '';
+  };
+
+  const handlePresetSlotUpload = async (e: React.ChangeEvent<HTMLInputElement>, slotIndex: number) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 12 * 1024 * 1024) {
+        alert('File size exceeds 12MB. Please choose an image under 12MB.');
+        return;
+      }
+      const compressedDataUrl = await compressImageFile(file);
+      if (compressedDataUrl) {
+        updateGalleryPresetPhoto(slotIndex, compressedDataUrl);
+      }
+    }
+    e.target.value = '';
   };
 
   const handleCategoryDirectFileUpload = (e: React.ChangeEvent<HTMLInputElement>, categoryId: string) => {
@@ -1318,6 +1350,50 @@ export const AdminPanel: React.FC = () => {
                   <span className="text-[11px] font-medium text-[#786550] mt-2">
                     Current Homepage Top Photo
                   </span>
+
+                  {/* 3-Image Auto-Slider Controls */}
+                  <div className="w-full max-w-xs mt-4 p-3.5 bg-[#faf5ee] rounded-2xl border border-[#ded0bf] space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#63503f]">
+                        1-Sec Auto Slider (3 Photos)
+                      </span>
+                      <span className="text-[10px] text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full font-bold">
+                        1s Cycle
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      {[0, 1, 2].map((sIdx) => {
+                        const currentSlides = siteMedia.heroImages || [
+                          siteMedia.heroImage,
+                          'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1200&q=85',
+                          'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1200&q=85'
+                        ];
+                        const slideImg = currentSlides[sIdx] || siteMedia.heroImage;
+
+                        return (
+                          <div key={sIdx} className="flex flex-col items-center gap-1 bg-white p-1.5 rounded-xl border border-[#e5d8c7] shadow-2xs">
+                            <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-[#eadecd]">
+                              <img src={slideImg} alt={`Slide ${sIdx + 1}`} className="w-full h-full object-cover" />
+                              <span className="absolute top-1 left-1 bg-black/60 text-white text-[8px] font-bold px-1 rounded">
+                                S{sIdx + 1}
+                              </span>
+                            </div>
+                            <label className="w-full py-1 bg-[#786550] hover:bg-[#62513f] text-white rounded text-[9px] font-bold text-center cursor-pointer flex items-center justify-center gap-0.5 shadow-2xs">
+                              <Upload className="w-2.5 h-2.5" />
+                              <span>Upload</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleHeroSlideUpload(e, sIdx)}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Right: Upload and Control Panel */}
@@ -1348,7 +1424,7 @@ export const AdminPanel: React.FC = () => {
                         }`}
                       >
                         <Sparkles className="w-3.5 h-3.5" />
-                        <span>Presets</span>
+                        <span>6 Photo Slots & Upload</span>
                       </button>
                       <button
                         type="button"
@@ -1389,30 +1465,136 @@ export const AdminPanel: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Hero Presets option */}
+                    {/* Hero Presets & 6 Uploadable Photo Slots */}
                     {heroPhotoTabMode === 'preset' && (
-                      <div className="space-y-2">
-                        <p className="text-xs text-[#786550]">Click any luxury ethnic wear preset to set as hero banner:</p>
-                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                          {PRESET_ETHNIC_IMAGES.map((preset, idx) => (
-                            <div
-                              key={idx}
-                              onClick={() => updateHeroImage(preset.url)}
-                              className={`relative aspect-[3/4] rounded-xl overflow-hidden border-2 cursor-pointer transition-all ${
-                                siteMedia.heroImage === preset.url
-                                  ? 'border-[#786550] ring-2 ring-[#786550]/40'
-                                  : 'border-[#d8c8b6] opacity-75 hover:opacity-100'
-                              }`}
-                              title={preset.label}
-                            >
-                              <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
-                              {siteMedia.heroImage === preset.url && (
-                                <div className="absolute top-1 right-1 bg-[#786550] text-white rounded-full p-0.5">
-                                  <Check className="w-3 h-3" />
+                      <div className="space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                          <p className="text-xs font-semibold text-[#524131]">
+                            6 Showcase Photo Slots — Apne phone ya PC se photo upload karein:
+                          </p>
+                          <span className="text-[11px] text-[#8e7a68]">
+                            Click "Upload Photo" to select from gallery
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+                          {((siteMedia.galleryPresets && siteMedia.galleryPresets.length > 0)
+                            ? siteMedia.galleryPresets
+                            : PRESET_ETHNIC_IMAGES.map((p, idx) => ({ id: `slot-${idx + 1}`, label: p.label, url: p.url }))
+                          ).map((slot, idx) => {
+                            const isMainHero = siteMedia.heroImage === slot.url;
+                            const currentSlides = siteMedia.heroImages || [
+                              siteMedia.heroImage,
+                              'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1200&q=85',
+                              'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1200&q=85'
+                            ];
+                            const slideIndex = currentSlides.indexOf(slot.url);
+
+                            return (
+                              <div
+                                key={idx}
+                                className={`group relative rounded-xl overflow-hidden border-2 bg-[#f0e6d8] transition-all flex flex-col shadow-xs ${
+                                  isMainHero
+                                    ? 'border-[#786550] ring-2 ring-[#786550]/40'
+                                    : 'border-[#ded0bf] hover:border-[#8f7863]'
+                                }`}
+                              >
+                                {/* Photo Container */}
+                                <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#e5d8c7]">
+                                  <img
+                                    src={slot.url}
+                                    alt={slot.label || `Photo Slot ${idx + 1}`}
+                                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 select-none"
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src =
+                                        'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=80';
+                                    }}
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
+
+                                  {/* Top Slot Badge */}
+                                  <div className="absolute top-1 left-1 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded text-[9px] font-bold text-white">
+                                    #{idx + 1}
+                                  </div>
+
+                                  {/* Status indicator badges */}
+                                  <div className="absolute top-1 right-1 flex flex-col gap-0.5 items-end">
+                                    {isMainHero && (
+                                      <div className="bg-[#786550] text-white rounded-full p-1 shadow-xs" title="Currently Main Hero">
+                                        <Check className="w-2.5 h-2.5" />
+                                      </div>
+                                    )}
+                                    {slideIndex !== -1 && (
+                                      <span className="bg-amber-600 text-white text-[8px] font-bold px-1 py-0.2 rounded shadow-xs">
+                                        Slide {slideIndex + 1}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {/* Direct Upload button overlay on card */}
+                                  <label
+                                    className="absolute bottom-1.5 inset-x-1.5 py-1 px-1 bg-[#786550]/95 hover:bg-[#62513f] text-white rounded-lg text-[10px] font-semibold flex items-center justify-center gap-1 cursor-pointer shadow-md transition-all active:scale-95"
+                                    title="Click to upload from phone or computer"
+                                  >
+                                    <Camera className="w-3 h-3" />
+                                    <span>Upload</span>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) => handlePresetSlotUpload(e, idx)}
+                                      className="hidden"
+                                    />
+                                  </label>
                                 </div>
-                              )}
-                            </div>
-                          ))}
+
+                                {/* Quick selection actions */}
+                                <div className="p-1.5 bg-white flex flex-col gap-1 border-t border-[#ded0bf]">
+                                  <button
+                                    type="button"
+                                    onClick={() => updateHeroImage(slot.url)}
+                                    className={`w-full py-1 px-1 text-[9px] font-semibold rounded transition-colors cursor-pointer text-center ${
+                                      isMainHero
+                                        ? 'bg-[#786550] text-white'
+                                        : 'bg-[#f4ece1] hover:bg-[#e9ded0] text-[#473a2e]'
+                                    }`}
+                                  >
+                                    {isMainHero ? '✓ Active Hero' : 'Set as Hero'}
+                                  </button>
+
+                                  {/* Quick assign to 1-sec slider */}
+                                  <div className="flex items-center justify-between gap-1 pt-0.5 border-t border-[#f0e6d8]">
+                                    <span className="text-[8px] text-[#7d6b57] font-semibold">Slider:</span>
+                                    <div className="flex gap-0.5">
+                                      <button
+                                        type="button"
+                                        onClick={() => updateHeroSlideImage(0, slot.url)}
+                                        title="Assign to Slider 1"
+                                        className="px-1 py-0.5 text-[8px] font-bold bg-[#ede2d4] hover:bg-[#ded0bf] text-[#483a2d] rounded cursor-pointer"
+                                      >
+                                        S1
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => updateHeroSlideImage(1, slot.url)}
+                                        title="Assign to Slider 2"
+                                        className="px-1 py-0.5 text-[8px] font-bold bg-[#ede2d4] hover:bg-[#ded0bf] text-[#483a2d] rounded cursor-pointer"
+                                      >
+                                        S2
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => updateHeroSlideImage(2, slot.url)}
+                                        title="Assign to Slider 3"
+                                        className="px-1 py-0.5 text-[8px] font-bold bg-[#ede2d4] hover:bg-[#ded0bf] text-[#483a2d] rounded cursor-pointer"
+                                      >
+                                        S3
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     )}

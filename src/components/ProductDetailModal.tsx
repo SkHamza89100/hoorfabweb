@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { ProductSize } from '../types';
-import { X, ShoppingBag, Ruler, Check, Star, ShieldCheck, RefreshCw, Truck } from 'lucide-react';
+import { X, Ruler, Star, ShieldCheck, RefreshCw, Truck } from 'lucide-react';
 import { WhatsAppIcon } from './WhatsAppIcon';
 
 export const ProductDetailModal: React.FC = () => {
-  const { selectedProduct, setSelectedProduct, addToCart, setIsCartOpen } = useStore();
+  const { selectedProduct, setSelectedProduct } = useStore();
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState<ProductSize>(
     selectedProduct?.sizes[0] || 'M'
   );
-  const [isStitched, setIsStitched] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
 
@@ -21,16 +20,11 @@ export const ProductDetailModal: React.FC = () => {
     setSelectedProduct(null);
   };
 
-  const handleAddToCart = () => {
-    addToCart(selectedProduct, selectedSize, isStitched, quantity);
-    setSelectedProduct(null);
-    setIsCartOpen(true);
-  };
+
 
   const handleWhatsAppOrder = () => {
-    const stitchType = isStitched ? 'Ready-to-Wear (Stitched)' : 'Unstitched Fabric';
     const message = encodeURIComponent(
-      `Hello HOOR FAB! I would like to order:\n\n*Product:* ${selectedProduct.title}\n*SKU:* ${selectedProduct.sku}\n*Category:* ${selectedProduct.category}\n*Size:* ${selectedSize}\n*Stitching:* ${stitchType}\n*Quantity:* ${quantity}\n*Price:* ₹${(selectedProduct.price * quantity).toLocaleString('en-IN')}\n\nPlease confirm order and delivery details!`
+      `Hello HOOR FAB! I would like to order:\n\n*Product:* ${selectedProduct.title}\n*SKU:* ${selectedProduct.sku}\n*Category:* ${selectedProduct.category}\n*Size:* ${selectedSize}\n*Quantity:* ${quantity}\n*Price:* ₹${(selectedProduct.price * quantity).toLocaleString('en-IN')}\n\nPlease confirm order and delivery details!`
     );
     window.open(`https://wa.me/918100032281?text=${message}`, '_blank');
   };
@@ -168,36 +162,7 @@ export const ProductDetailModal: React.FC = () => {
                 {selectedProduct.description}
               </p>
 
-              {/* Stitching Option Toggle */}
-              <div className="mt-5 space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[#635140] block">
-                  Stitching Preference:
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => setIsStitched(true)}
-                    className={`py-2 px-3 rounded-xl text-xs font-medium border flex items-center justify-center gap-2 transition-all ${
-                      isStitched
-                        ? 'bg-[#786550] text-white border-[#786550] shadow-sm'
-                        : 'bg-[#f5ece1] text-[#4d3e30] border-[#d8c7b4] hover:bg-[#ede1d2]'
-                    }`}
-                  >
-                    {isStitched && <Check className="w-3.5 h-3.5" />}
-                    <span>Ready-to-Wear (Stitched)</span>
-                  </button>
-                  <button
-                    onClick={() => setIsStitched(false)}
-                    className={`py-2 px-3 rounded-xl text-xs font-medium border flex items-center justify-center gap-2 transition-all ${
-                      !isStitched
-                        ? 'bg-[#786550] text-white border-[#786550] shadow-sm'
-                        : 'bg-[#f5ece1] text-[#4d3e30] border-[#d8c7b4] hover:bg-[#ede1d2]'
-                    }`}
-                  >
-                    {!isStitched && <Check className="w-3.5 h-3.5" />}
-                    <span>Unstitched Fabric Set</span>
-                  </button>
-                </div>
-              </div>
+              
 
               {/* Size Selector */}
               <div className="mt-5 space-y-2">
@@ -277,25 +242,12 @@ export const ProductDetailModal: React.FC = () => {
             </div>
 
             {/* Bottom Actions */}
-            <div className="pt-4 border-t border-[#ebdcca] space-y-2.5">
-              <button
-                onClick={handleAddToCart}
-                disabled={!selectedProduct.inStock}
-                className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 bg-[#786550] hover:bg-[#63513e] disabled:bg-gray-400 text-white rounded-xl text-sm font-semibold tracking-wide shadow-sm hover:shadow transition-all"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span>
-                  {selectedProduct.inStock ? `Add to Bag • ₹${(selectedProduct.price * quantity).toLocaleString('en-IN')}` : 'Currently Sold Out'}
-                </span>
-              </button>
-
+            <div className="pt-4 border-t border-[#ebdcca]">
               <button
                 onClick={handleWhatsAppOrder}
-                className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-6 bg-[#f4ece1] hover:bg-[#ebdcca] text-[#3d3126] border border-[#cfbeac] rounded-xl text-xs sm:text-sm font-medium tracking-wide transition-all shadow-sm"
+                className="w-full inline-flex items-center justify-center gap-2.5 py-3.5 px-6 bg-[#25D366] hover:bg-[#20ba59] text-white rounded-xl text-sm sm:text-base font-semibold tracking-wide transition-all shadow-md hover:shadow-lg cursor-pointer"
               >
-                <div className="w-5 h-5 rounded-full bg-[#25D366] text-white flex items-center justify-center">
-                  <WhatsAppIcon size={13} color="#ffffff" />
-                </div>
+                <WhatsAppIcon size={22} color="#ffffff" />
                 <span>Order Directly on WhatsApp</span>
               </button>
             </div>

@@ -47,7 +47,7 @@ export async function initializeFirestoreSeed(): Promise<void> {
     const mediaSnap = await getDoc(mediaDocRef);
     if (!mediaSnap.exists()) {
       console.log('[Firebase] Seeding site media banners to Firestore...');
-      await setDoc(mediaDocRef, INITIAL_SITE_MEDIA);
+      await saveSiteMediaToFirestore(INITIAL_SITE_MEDIA);
     }
 
     // 3. Check & Seed Orders
@@ -127,10 +127,30 @@ export function subscribeToOrders(callback: (orders: Order[]) => void) {
 
 export function subscribeToSiteMedia(callback: (media: SiteMediaConfig) => void) {
   return onSnapshot(
-    doc(db, 'siteMedia', 'config'),
+    collection(db, 'siteMedia'),
     (snapshot) => {
-      if (snapshot.exists()) {
-        callback(snapshot.data() as SiteMediaConfig);
+      if (!snapshot.empty) {
+        let merged: Partial<SiteMediaConfig> = {};
+        snapshot.docs.forEach((d) => {
+          const data = d.data();
+          if (d.id === 'config') {
+            merged = { ...merged, ...data };
+          } else if (d.id === 'hero') {
+            if (data.heroImage) merged.heroImage = data.heroImage;
+            if (data.heroImages) merged.heroImages = data.heroImages;
+          } else if (d.id === 'presets') {
+            if (data.galleryPresets) merged.galleryPresets = data.galleryPresets;
+          } else if (d.id === 'categories') {
+            if (data.categories) merged.categories = data.categories;
+          }
+        });
+
+        if (merged.heroImage || merged.categories || merged.galleryPresets) {
+          callback({
+            ...INITIAL_SITE_MEDIA,
+            ...merged
+          } as SiteMediaConfig);
+        }
       }
     },
     (err) => console.warn('[Firebase] SiteMedia listener notice:', err)
@@ -226,7 +246,38 @@ export async function updateOrderStatusInFirestore(orderId: string, status: Orde
 
 export async function saveSiteMediaToFirestore(siteMedia: SiteMediaConfig): Promise<void> {
   try {
-    await setDoc(doc(db, 'siteMedia', 'config'), siteMedia);
+    // 1. Text & layout settings (< 1KB) - replaces previous monolithic doc
+    const configData = {
+      heroHeadline: siteMedia.heroHeadline || '',
+      heroSubtitle: siteMedia.heroSubtitle || '',
+      heroBadgeTitle: siteMedia.heroBadgeTitle || '',
+      heroBadgeSubtitle: siteMedia.heroBadgeSubtitle || '',
+      updatedAt: new Date().toISOString()
+    };
+
+    // 2. Hero showcase images (< 100KB)
+    const heroData = {
+      heroImage: siteMedia.heroImage || '',
+      heroImages: siteMedia.heroImages || []
+    };
+
+    // 3. Preset photo slots (< 150KB)
+    const presetsData = {
+      galleryPresets: siteMedia.galleryPresets || []
+    };
+
+    // 4. Category collection cards (< 150KB)
+    const categoriesData = {
+      categories: siteMedia.categories || []
+    };
+
+    // Save modular documents in parallel so no single document ever approaches 1MB
+    await Promise.all([
+      setDoc(doc(db, 'siteMedia', 'config'), configData),
+      setDoc(doc(db, 'siteMedia', 'hero'), heroData),
+      setDoc(doc(db, 'siteMedia', 'presets'), presetsData),
+      setDoc(doc(db, 'siteMedia', 'categories'), categoriesData)
+    ]);
   } catch (e) {
     console.error('[Firebase] Failed to save site media:', e);
   }
@@ -267,7 +318,7 @@ export async function resetAllFirestoreData(): Promise<void> {
     await prodBatch.commit();
 
     // Reset site media
-    await setDoc(doc(db, 'siteMedia', 'config'), INITIAL_SITE_MEDIA);
+    await saveSiteMediaToFirestore(INITIAL_SITE_MEDIA);
 
     // Reset orders
     const orderBatch = writeBatch(db);

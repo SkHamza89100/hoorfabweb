@@ -105,14 +105,14 @@ export const Footer: React.FC = () => {
           </button>
         </div>
 
-        {/* Bottom Bar: Discreet Admin Access */}
-        <div className="mt-8 pt-4 border-t border-[#8e7a66]/30 flex items-center justify-center text-xs">
+        {/* Bottom Bar: Discreet Admin Access (Hidden on mobile per user request) */}
+        <div className="hidden sm:flex mt-8 pt-4 border-t border-[#8e7a66]/30 items-center justify-center text-xs">
           <button
             onClick={() => {
               setActiveView('admin');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/20 hover:bg-black/35 text-[#f5eee6] hover:text-white transition-all text-xs font-medium border border-[#a6927d]/40 shadow-sm cursor-pointer"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/20 hover:bg-black/35 text-[#f5eee6] hover:text-white transition-all text-xs font-medium border border-[#a6927d]/40 shadow-sm cursor-pointer"
             title="Owner & Manager Access"
           >
             <Lock className="w-3.5 h-3.5 text-[#d5be9b]" />

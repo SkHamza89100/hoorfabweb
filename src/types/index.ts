@@ -115,8 +115,16 @@ export interface CategoryMediaItem {
   subtitle?: string;
 }
 
+export interface GalleryPresetSlot {
+  id: string;
+  label: string;
+  url: string;
+}
+
 export interface SiteMediaConfig {
   heroImage: string;
+  heroImages?: string[];
+  galleryPresets?: GalleryPresetSlot[];
   heroHeadline: string;
   heroSubtitle: string;
   heroBadgeTitle: string;

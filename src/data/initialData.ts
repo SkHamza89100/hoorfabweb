@@ -430,6 +430,43 @@ export const INITIAL_ACTIVITY: ActivityLog[] = [
 
 export const INITIAL_SITE_MEDIA: SiteMediaConfig = {
   heroImage: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=85',
+  heroImages: [
+    'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1200&q=85'
+  ],
+  galleryPresets: [
+    {
+      id: 'slot-1',
+      label: 'Photo 1 (Royal Maroon Suit)',
+      url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=80'
+    },
+    {
+      id: 'slot-2',
+      label: 'Photo 2 (Ivory Floral Kurti)',
+      url: 'https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=1000&q=80'
+    },
+    {
+      id: 'slot-3',
+      label: 'Photo 3 (Sage Green Suit)',
+      url: 'https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=1000&q=80'
+    },
+    {
+      id: 'slot-4',
+      label: 'Photo 4 (Dusty Rose Kurti)',
+      url: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=80'
+    },
+    {
+      id: 'slot-5',
+      label: 'Photo 5 (Emerald Velvet Ensemble)',
+      url: 'https://images.unsplash.com/photo-1610030469668-932d44933a3c?auto=format&fit=crop&w=1000&q=80'
+    },
+    {
+      id: 'slot-6',
+      label: 'Photo 6 (Ivory Organza Zari Suit)',
+      url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=80'
+    }
+  ],
   heroHeadline: 'Made for the HOOR',
   heroSubtitle: 'Elegant styles for every occasion — from everyday grace to timeless charm. Handcrafted Pakistani suits, pure lawn, organza, and artisanal embroideries.',
   heroBadgeTitle: 'Festive Formals Drop',

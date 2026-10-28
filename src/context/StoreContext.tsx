@@ -37,6 +37,7 @@ import {
   addActivityLogToFirestore,
   resetAllFirestoreData
 } from '../services/firebaseDb';
+import { compressDataUrl } from '../utils/imageCompressor';
 
 interface CouponInfo {
   code: string;
@@ -106,7 +107,9 @@ interface StoreContextType {
 
   siteMedia: SiteMediaConfig;
   updateHeroImage: (imageUrl: string) => void;
+  updateHeroSlideImage: (slideIndex: number, imageUrl: string) => void;
   updateHeroDetails: (updates: { headline?: string; subtitle?: string; badgeTitle?: string; badgeSubtitle?: string }) => void;
+  updateGalleryPresetPhoto: (slotIndex: number, newUrl: string, newLabel?: string) => void;
   updateCategoryMedia: (categoryId: string, image: string, label?: string) => void;
   resetSiteMedia: () => void;
 
@@ -274,6 +277,59 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, []);
 
+  // Defensive sanitization: Automatically compress and shrink any oversized base64 images
+  // from previous uploads so memory, localStorage, and Firestore payloads remain ultra-light
+  useEffect(() => {
+    const isOversized = (url?: string) => typeof url === 'string' && url.startsWith('data:image') && url.length > 120000;
+    
+    const hasBloat = 
+      isOversized(siteMedia.heroImage) ||
+      siteMedia.heroImages?.some(isOversized) ||
+      siteMedia.galleryPresets?.some((p) => isOversized(p.url)) ||
+      siteMedia.categories.some((c) => isOversized(c.image));
+
+    if (hasBloat) {
+      (async () => {
+        try {
+          const cleanHero = isOversized(siteMedia.heroImage)
+            ? await compressDataUrl(siteMedia.heroImage)
+            : siteMedia.heroImage;
+
+          const cleanHeroImages = await Promise.all(
+            (siteMedia.heroImages || []).map(async (img) => (isOversized(img) ? await compressDataUrl(img) : img))
+          );
+
+          const cleanPresets = await Promise.all(
+            (siteMedia.galleryPresets || []).map(async (p) => ({
+              ...p,
+              url: isOversized(p.url) ? await compressDataUrl(p.url) : p.url
+            }))
+          );
+
+          const cleanCategories = await Promise.all(
+            siteMedia.categories.map(async (c) => ({
+              ...c,
+              image: isOversized(c.image) ? await compressDataUrl(c.image) : c.image
+            }))
+          );
+
+          const sanitized: SiteMediaConfig = {
+            ...siteMedia,
+            heroImage: cleanHero,
+            heroImages: cleanHeroImages,
+            galleryPresets: cleanPresets,
+            categories: cleanCategories
+          };
+
+          setSiteMedia(sanitized);
+          saveSiteMediaToFirestore(sanitized);
+        } catch (e) {
+          console.warn('[SiteMedia] Sanitization notice:', e);
+        }
+      })();
+    }
+  }, []);
+
   // Sync to localStorage as high-performance offline cache
   useEffect(() => {
     try {
@@ -388,9 +444,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const updateHeroImage = (imageUrl: string) => {
     const trimmed = imageUrl.trim();
     if (!trimmed) return;
+    const currentHeroImages = siteMedia.heroImages && siteMedia.heroImages.length > 0
+      ? [...siteMedia.heroImages]
+      : (INITIAL_SITE_MEDIA.heroImages || [trimmed]);
+    currentHeroImages[0] = trimmed;
+
     const updatedMedia: SiteMediaConfig = {
       ...siteMedia,
-      heroImage: trimmed
+      heroImage: trimmed,
+      heroImages: currentHeroImages
     };
     setSiteMedia(updatedMedia);
     saveSiteMediaToFirestore(updatedMedia);
@@ -404,6 +466,66 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setActivityLogs((prev) => [log, ...prev]);
     addActivityLogToFirestore(log);
     showToast('Hero banner photo updated & saved to Firebase!');
+  };
+
+  const updateHeroSlideImage = (slideIndex: number, imageUrl: string) => {
+    const trimmed = imageUrl.trim();
+    if (!trimmed) return;
+    const currentHeroImages = siteMedia.heroImages && siteMedia.heroImages.length > 0
+      ? [...siteMedia.heroImages]
+      : (INITIAL_SITE_MEDIA.heroImages || [siteMedia.heroImage]);
+    
+    currentHeroImages[slideIndex] = trimmed;
+
+    const updatedMedia: SiteMediaConfig = {
+      ...siteMedia,
+      heroImage: slideIndex === 0 ? trimmed : siteMedia.heroImage,
+      heroImages: currentHeroImages
+    };
+    setSiteMedia(updatedMedia);
+    saveSiteMediaToFirestore(updatedMedia);
+
+    showToast(`Hero Slide #${slideIndex + 1} photo updated in live showcase!`);
+  };
+
+  const updateGalleryPresetPhoto = (slotIndex: number, newUrl: string, newLabel?: string) => {
+    const trimmed = newUrl.trim();
+    if (!trimmed) return;
+    const defaultPresets = INITIAL_SITE_MEDIA.galleryPresets || [];
+    const currentPresets = siteMedia.galleryPresets && siteMedia.galleryPresets.length > 0
+      ? [...siteMedia.galleryPresets]
+      : [...defaultPresets];
+
+    if (slotIndex >= 0 && slotIndex < currentPresets.length) {
+      currentPresets[slotIndex] = {
+        ...currentPresets[slotIndex],
+        url: trimmed,
+        ...(newLabel ? { label: newLabel } : {})
+      };
+    } else {
+      currentPresets.push({
+        id: `slot-${Date.now()}`,
+        label: newLabel || `Uploaded Photo ${currentPresets.length + 1}`,
+        url: trimmed
+      });
+    }
+
+    const updatedMedia: SiteMediaConfig = {
+      ...siteMedia,
+      galleryPresets: currentPresets
+    };
+    setSiteMedia(updatedMedia);
+    saveSiteMediaToFirestore(updatedMedia);
+
+    const log: ActivityLog = {
+      id: `act-${Date.now()}`,
+      timestamp: 'Just now',
+      type: 'inventory_update',
+      description: `Photo slot #${slotIndex + 1} updated in Cloud Firestore`
+    };
+    setActivityLogs((prev) => [log, ...prev]);
+    addActivityLogToFirestore(log);
+    showToast(`Photo #${slotIndex + 1} uploaded & saved in Admin Panel!`);
   };
 
   const updateHeroDetails = (updates: { headline?: string; subtitle?: string; badgeTitle?: string; badgeSubtitle?: string }) => {
@@ -783,7 +905,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         adminLogout,
         siteMedia,
         updateHeroImage,
+        updateHeroSlideImage,
         updateHeroDetails,
+        updateGalleryPresetPhoto,
         updateCategoryMedia,
         resetSiteMedia,
         resetToDemoData,

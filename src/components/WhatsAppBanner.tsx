@@ -44,8 +44,8 @@ export const WhatsAppBanner: React.FC = () => {
                   onClick={handleSendScreenshot}
                   className="inline-flex items-center gap-2.5 px-6 py-3.5 bg-[#786550] hover:bg-[#63513e] text-white rounded-full font-medium text-xs sm:text-sm tracking-wide shadow-sm hover:shadow transition-all group"
                 >
-                  <div className="w-5 h-5 rounded-full bg-[#25D366] text-white flex items-center justify-center">
-                    <WhatsAppIcon size={13} color="#ffffff" />
+                  <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                    <WhatsAppIcon size={20} />
                   </div>
                   <span>Send Screenshot on WhatsApp</span>
                 </button>

@@ -1,10 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
 import { ArrowRight } from 'lucide-react';
 import { WhatsAppIcon } from './WhatsAppIcon';
 
 export const Hero: React.FC = () => {
   const { setActiveView, siteMedia } = useStore();
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Exactly 3 curated ethnic fashion images for the hero showcase, dynamically powered by admin uploads
+  const heroSlides = useMemo(() => {
+    const customImages = siteMedia.heroImages || [];
+    const img1 = customImages[0] || siteMedia.heroImage || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=85';
+    const img2 = customImages[1] || 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1200&q=85';
+    const img3 = customImages[2] || 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1200&q=85';
+
+    return [
+      {
+        url: img1,
+        title: siteMedia.heroBadgeTitle || 'Festive Formals Drop',
+        subtitle: siteMedia.heroBadgeSubtitle || 'Raw Silk & Organza Tilla'
+      },
+      {
+        url: img2,
+        title: 'Artisanal Velvet & Zari',
+        subtitle: 'Intricate Tilla Hand Embroidery'
+      },
+      {
+        url: img3,
+        title: 'Ivory Organza Luxe',
+        subtitle: 'Pure Cutwork Scalloped Dupatta'
+      }
+    ].slice(0, 3);
+  }, [siteMedia.heroImage, siteMedia.heroImages, siteMedia.heroBadgeTitle, siteMedia.heroBadgeSubtitle]);
+
+  // Auto-slide every 1 second (1000ms) as requested
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [heroSlides.length]);
 
   const handleWhatsAppDirect = () => {
     const text = encodeURIComponent(
@@ -56,8 +92,8 @@ export const Hero: React.FC = () => {
                 onClick={handleWhatsAppDirect}
                 className="inline-flex items-center gap-2.5 px-5 sm:px-6 py-3 sm:py-3.5 bg-[#f4ece1] hover:bg-[#ebdfd0] text-[#473a2e] border border-[#cfbdab] rounded-full font-medium text-xs sm:text-sm tracking-wide transition-all shadow-sm cursor-pointer"
               >
-                <div className="w-5 h-5 rounded-full bg-[#25D366] text-white flex items-center justify-center">
-                  <WhatsAppIcon size={13} color="#ffffff" />
+                <div className="w-5 h-5 flex items-center justify-center shrink-0">
+                  <WhatsAppIcon size={20} />
                 </div>
                 <span>Order on WhatsApp</span>
               </button>
@@ -71,34 +107,62 @@ export const Hero: React.FC = () => {
               <div className="absolute -inset-2 bg-gradient-to-t from-[#cbb49b]/30 to-transparent rounded-[2.5rem] -rotate-1 pointer-events-none" />
               
               <div className="relative rounded-[2rem] overflow-hidden shadow-xl border border-[#ded0bf] bg-[#eadecd] aspect-[3/4] max-h-[460px] sm:max-h-[520px] w-full">
-                {/* Hero Showcase Image driven from real-time admin panel */}
-                <img
-                  src={siteMedia.heroImage}
-                  alt="HOOR FAB Luxury Ethnic Wear Model"
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover object-top hover:scale-102 transition-transform duration-700"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=85';
-                  }}
-                />
+                {/* 3-Image Auto-sliding Track (1-second interval) */}
+                <div 
+                  className="flex w-full h-full transition-transform duration-500 ease-in-out"
+                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                >
+                  {heroSlides.map((slide, index) => (
+                    <div key={index} className="w-full h-full min-w-full flex-shrink-0 relative">
+                      <img
+                        src={slide.url}
+                        alt={`HOOR FAB Luxury Ethnic Wear - Look ${index + 1}`}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover object-top select-none"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=85';
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
                 
                 {/* Subtle soft lighting scrim */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#362c22]/40 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#362c22]/45 via-transparent to-transparent pointer-events-none" />
+
+                {/* Slide indicator dots */}
+                <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5 bg-black/35 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-white/20">
+                  {heroSlides.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentSlide(idx)}
+                      aria-label={`Go to slide ${idx + 1}`}
+                      className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                        currentSlide === idx ? 'w-5 bg-white' : 'w-1.5 bg-white/50 hover:bg-white/80'
+                      }`}
+                    />
+                  ))}
+                </div>
 
                 {/* Floating pill badge */}
-                <div className="absolute bottom-4 left-4 right-4 bg-[#fcf9f5]/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-[#ded0bf] flex items-center justify-between text-xs">
+                <div className="absolute bottom-4 left-4 right-4 bg-[#fcf9f5]/92 backdrop-blur-md px-4 py-2.5 rounded-xl border border-[#ded0bf] flex items-center justify-between text-xs z-10 shadow-sm transition-all duration-300">
                   <div className="flex flex-col">
                     <span className="font-serif font-bold text-[#342a20] text-sm">
-                      {siteMedia.heroBadgeTitle || 'Festive Formals Drop'}
+                      {heroSlides[currentSlide]?.title || 'Festive Formals Drop'}
                     </span>
                     <span className="text-[#7d6b57]">
-                      {siteMedia.heroBadgeSubtitle || 'Raw Silk & Organza Tilla'}
+                      {heroSlides[currentSlide]?.subtitle || 'Raw Silk & Organza Tilla'}
                     </span>
                   </div>
-                  <span className="font-semibold text-[#8a7258] uppercase tracking-wider text-[11px]">
-                    Available Now
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] text-[#8a7258] bg-[#f2e7db] px-2 py-0.5 rounded-full font-semibold">
+                      {currentSlide + 1} / {heroSlides.length}
+                    </span>
+                    <span className="font-semibold text-[#8a7258] uppercase tracking-wider text-[11px] hidden sm:inline">
+                      Available Now
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
